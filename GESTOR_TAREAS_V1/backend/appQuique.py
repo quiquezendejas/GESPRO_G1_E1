@@ -1,15 +1,12 @@
 from flask import Flask, jsonify
-from flask_cors import CORS # Importante para que el frontend pueda conectar
+from flask_cors import CORS  # <--- 1. Importar esto
 
 app = Flask(__name__)
-CORS(app) # Permite peticiones desde el frontend
+CORS(app) # <--- 2. Activar esto para todas las rutas
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({
-        "status": "online",
-        "message": "Backend funcionando correctamente"
-    }), 200
+    return jsonify({"message": "Conectado al backend"})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True)
