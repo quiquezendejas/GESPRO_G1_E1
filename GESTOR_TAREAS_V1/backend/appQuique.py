@@ -4,17 +4,20 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# 🧠 Persistencia en memoria
+# Persistencia en memoria
 tasks = []
 next_id = 1
 
+# GET /tasks → listar tareas
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
     return jsonify(tasks), 200
 
+# ✅ POST /tasks → crear tarea
 @app.route('/tasks', methods=['POST'])
 def create_task():
     global next_id
+
     data = request.json
 
     task = {
