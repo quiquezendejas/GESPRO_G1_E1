@@ -1,17 +1,35 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kanban Project</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styleQuique.css') }}">
-</head>
-<body>
+<section id="crear-tarea">
+    <h2>Crear Nueva Tarea</h2>
+    <form id="task-form">
+        <div>
+            <label>Nombre:</label><br>
+            <input type="text" id="nombre" required>
+        </div><br>
 
-    <h1>Gestor de Tareas Kanban</h1>
+        <div>
+            <label>Descripción:</label><br>
+            <textarea id="descripcion" required></textarea>
+        </div><br>
 
-    <div id="contenedor-tareas"></div>
+        <div>
+            <label>Dificultad (1-10):</label><br>
+            <input type="number" id="dificultad" min="1" max="10" value="5">
+        </div><br>
 
-    <script src="{{ url_for('static', filename='scriptQuique.js') }}"></script>
-</body>
-</html>
+        <div>
+            <label>Asignar a:</label><br>
+            <input type="text" id="asignado" placeholder="Nombre del responsable">
+        </div><br>
+
+        <div>
+            <label>Estado:</label><br>
+            <select id="estado">
+                <option value="to do">To Do</option>
+                <option value="in progress">In Progress</option>
+                <option value="done">Done</option>
+            </select>
+        </div><br>
+
+        <button type="submit">Crear Tarea</button>
+    </form>
+</section>
