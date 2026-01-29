@@ -3,25 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GESPRO G1_E1 - Dashboard</title>
-    <style>
-        body { font-family: sans-serif; margin: 40px; background-color: #f4f4f9; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px;}
-        .status-box { padding: 15px; border-radius: 5px; margin-top: 20px; }
-        .online { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .offline { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    </style>
+    <title>Kanban Project</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleQuique.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Panel de Control - Grupo 1</h1>
-        <p>Bienvenido al sistema de gestión de proyecto.</p>
-        <hr>
-        
-        <h3>Estado del Servidor:</h3>
-        <div id="status-indicator" class="status-box">Verificando conexión...</div>
-    </div>
 
-    <script src="scriptQuique.js"></script>
+    <h1>Gestor de Tareas Kanban</h1>
+
+    <div id="contenedor-tareas"></div>
+
+    <script src="{{ url_for('static', filename='scriptQuique.js') }}"></script>
 </body>
 </html>
