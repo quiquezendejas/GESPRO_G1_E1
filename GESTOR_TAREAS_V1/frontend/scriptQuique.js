@@ -51,5 +51,5 @@ function clearForm() {
 }
 
 // Cargar tareas al abrir la página
-loadTasks();
 
+loadTasks();
