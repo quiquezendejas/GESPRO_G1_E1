@@ -2,36 +2,39 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 app = Flask(__name__)
+# IMPORTANTE: CORS(app) permite que tus compañeros se conecten desde sus propias máquinas o carpetas
 CORS(app)
 
-# 🧠 Simulación de base de datos
-tasks = [
-    {"id": 1, "name": "Configurar proyecto"},
-    {"id": 2, "name": "Crear backend mínimo"}
-]
+# Base de datos temporal
+tareas = []
 
-@app.route('/health', methods=['GET'])
-def health_check():
-    return jsonify({
-        "status": "online",
-        "message": "Backend funcionando correctamente"
-    }), 200
+@app.route('/tareas', methods=['GET'])
+def obtener_tareas():
+    """Para que el equipo de Frontend liste el Kanban"""
+    return jsonify(tareas), 200
 
-# ✅ GET /tasks
-@app.route('/tasks', methods=['GET'])
-def get_tasks():
-    return jsonify(tasks), 200
-
-# (opcional, lo dejamos para después)
-@app.route('/tasks', methods=['POST'])
-def create_task():
-    data = request.json
-    new_task = {
-        "id": len(tasks) + 1,
-        "name": data.get("name")
+@app.route('/tareas', methods=['POST'])
+def crear_tarea():
+    """Para que el equipo de Frontend envíe el formulario"""
+    data = request.get_json()
+    
+    # Validar que lleguen los campos necesarios
+    campos_requeridos = ['nombre', 'descripcion', 'dificultad', 'asignado', 'estado']
+    if not data or not all(campo in data for campo in campos_requeridos):
+        return jsonify({"error": "Faltan datos. Requeridos: " + ", ".join(campos_requeridos)}), 400
+    
+    nueva_tarea = {
+        "id": len(tareas) + 1,
+        "nombre": data['nombre'],
+        "descripcion": data['descripcion'],
+        "dificultad": data['dificultad'],
+        "asignado": data['asignado'],
+        "estado": data['estado']
     }
-    tasks.append(new_task)
-    return jsonify(new_task), 201
+    
+    tareas.append(nueva_tarea)
+    return jsonify({"message": "Tarea creada", "tarea": nueva_tarea}), 201
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # '0.0.0.0' permite que otros en tu misma red WiFi vean tu servidor usando tu IP
+    app.run(debug=True, host='0.0.0.0', port=5000)
