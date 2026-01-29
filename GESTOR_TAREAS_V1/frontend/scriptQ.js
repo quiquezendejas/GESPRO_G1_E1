@@ -8,16 +8,20 @@ function actualizarTablero() {
     fetch(API_URL)
         .then(response => response.json())
         .then(tareas => {
-            // Limpiar las listas actuales para evitar duplicados
+            // Limpiar las listas actuales
             document.getElementById('list-to-do').innerHTML = '';
             document.getElementById('list-in-progress').innerHTML = '';
             document.getElementById('list-done').innerHTML = '';
 
-            // Recorrer cada tarea y crear su tarjeta visual
             tareas.forEach(tarea => {
                 const card = document.createElement('div');
                 card.className = 'task-card';
+                
+                // Aquí inyectamos el botón de eliminar (X)
                 card.innerHTML = `
+                    <button class="delete-btn" onclick="eliminarTarea(${tarea.id})" title="Eliminar tarea">
+                        ✕
+                    </button>
                     <h4>${tarea.nombre}</h4>
                     <p>${tarea.descripcion}</p>
                     <div class="badge-container">
@@ -39,11 +43,10 @@ function actualizarTablero() {
         .catch(error => console.error('Error al cargar tareas:', error));
 }
 
-// 2. Evento para manejar el envío del formulario
+// 2. Evento para crear tarea
 taskForm.addEventListener('submit', (e) => {
-    e.preventDefault(); // Evitar que la página se refresque
+    e.preventDefault(); 
 
-    // Capturar los datos del formulario
     const nuevaTarea = {
         nombre: document.getElementById('nombre').value,
         descripcion: document.getElementById('descripcion').value,
@@ -52,25 +55,43 @@ taskForm.addEventListener('submit', (e) => {
         estado: document.getElementById('estado').value
     };
 
-    // Enviar datos al Backend (POST)
     fetch(API_URL, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevaTarea)
     })
     .then(response => response.json())
     .then(data => {
         console.log('Éxito:', data.message);
-        taskForm.reset();       // Limpiar el formulario
-        actualizarTablero();    // <--- Actualizar el tablero visualmente
+        taskForm.reset();       
+        actualizarTablero();    
     })
     .catch(error => {
-        alert('Error al conectar con el servidor. Verifica que Flask esté corriendo.');
+        alert('Error al conectar con el servidor.');
         console.error('Error:', error);
     });
 });
 
-// 3. Cargar las tareas existentes al abrir la página
+// 3. NUEVA FUNCIÓN: Eliminar Tarea
+function eliminarTarea(id) {
+    // Confirmación simple para evitar borrados accidentales
+    if (!confirm("¿Estás seguro de querer eliminar esta tarea?")) {
+        return;
+    }
+
+    fetch(`${API_URL}/${id}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log(`Tarea ${id} eliminada`);
+            actualizarTablero(); // Recargamos el tablero para ver los cambios
+        } else {
+            console.error('Error al eliminar tarea');
+        }
+    })
+    .catch(error => console.error('Error de red:', error));
+}
+
+// 4. Cargar tareas al inicio
 document.addEventListener('DOMContentLoaded', actualizarTablero);

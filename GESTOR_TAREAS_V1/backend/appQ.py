@@ -2,15 +2,14 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 app = Flask(__name__)
-# Habilita CORS para permitir peticiones desde tu frontend (indexQuique.html)
+# Habilita CORS para permitir peticiones desde tu frontend
 CORS(app)
 
-# Base de datos temporal en memoria (se reinicia si detienes el servidor)
+# Base de datos temporal en memoria
 tareas = []
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Endpoint de prueba para verificar que el servidor está activo."""
     return jsonify({
         "status": "online",
         "message": "Servidor de GESPRO G1_E1 funcionando"
@@ -18,33 +17,42 @@ def health_check():
 
 @app.route('/tareas', methods=['GET'])
 def obtener_tareas():
-    """Devuelve la lista de todas las tareas registradas."""
     return jsonify(tareas), 200
 
 @app.route('/tareas', methods=['POST'])
 def crear_tarea():
-    """Recibe los datos del formulario y los guarda en la lista."""
     data = request.get_json()
     
-    # Estructura basada en tus requerimientos
     nueva_tarea = {
-        "id": len(tareas) + 1,
+        "id": len(tareas) + 1, # ID simple incremental
         "nombre": data.get('nombre'),
         "descripcion": data.get('descripcion'),
         "dificultad": data.get('dificultad'),
         "asignado": data.get('asignado'),
-        "estado": data.get('estado') # 'to do', 'in progress', o 'done'
+        "estado": data.get('estado')
     }
     
     tareas.append(nueva_tarea)
-    
-    # Imprime en la consola de VS Code para que veas la actividad en tiempo real
-    print(f"Nueva tarea recibida: {nueva_tarea['nombre']} ({nueva_tarea['estado']})")
+    print(f"Nueva tarea: {nueva_tarea['nombre']} ({nueva_tarea['estado']})")
     
     return jsonify({
         "message": "Tarea creada con éxito",
         "tarea": nueva_tarea
     }), 201
 
+# --- NUEVA RUTA PARA ELIMINAR ---
+@app.route('/tareas/<int:id_tarea>', methods=['DELETE'])
+def eliminar_tarea(id_tarea):
+    global tareas
+    # Filtramos la lista: mantenemos todas las tareas cuyo ID sea DISTINTO al que queremos borrar
+    tareas_filtradas = [t for t in tareas if t['id'] != id_tarea]
+    
+    # Verificamos si se borró algo (opcional, pero buena práctica)
+    if len(tareas) == len(tareas_filtradas):
+         return jsonify({"message": "Tarea no encontrada"}), 404
+         
+    tareas = tareas_filtradas
+    return jsonify({"message": "Tarea eliminada correctamente"}), 200
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5000) 
+    app.run(debug=True, port=5000)

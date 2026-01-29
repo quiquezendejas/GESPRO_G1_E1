@@ -11,11 +11,11 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-main);
-    margin: 0;
+    margin: 0; 
     padding: 20px;
 }
 
-/* ENCABEZADO NUEVA TAREA */
+/* ENCABEZADO DE NUEVA TAREA */
 .form-header {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -140,4 +140,47 @@ input, select {
     border-radius: 8px;
     margin-bottom: 10px;
     border-left: 4px solid var(--accent);
+}
+/* Agrega esto a tus estilos existentes */
+
+.task-card {
+    /* Es importante que sea relative para poder posicionar el botón dentro */
+    position: relative; 
+    /* ... resto de tus estilos ... */
+}
+
+/* Estilo del botón de eliminar */
+.delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    
+    /* Inicialmente invisible */
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out, transform 0.2s;
+    
+    /* Centrar la X dentro del circulo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.delete-btn:hover {
+    background-color: #cc0000;
+    transform: scale(1.1);
+}
+
+/* Cuando el mouse está sobre la tarjeta, mostramos el botón */
+.task-card:hover .delete-btn {
+    opacity: 1;
 }

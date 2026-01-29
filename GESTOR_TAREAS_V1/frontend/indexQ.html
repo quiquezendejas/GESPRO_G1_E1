@@ -36,7 +36,7 @@
             box-sizing: border-box; 
         }
 
-        button { 
+        button[type="submit"] { 
             width: 100%; 
             padding: 12px; 
             background-color: #28a745; 
@@ -48,7 +48,7 @@
             transition: background 0.3s;
         }
 
-        button:hover { background-color: #218838; }
+        button[type="submit"]:hover { background-color: #218838; }
 
         /* Estructura del Tablero Kanban */
         .kanban-board {
@@ -85,7 +85,7 @@
             min-height: 100px;
         }
 
-        /* Estilo de las Tarjetas de Tarea */
+        /* --- ESTILOS DE TARJETA Y BOTÓN ELIMINAR --- */
         .task-card {
             background: white;
             margin-bottom: 15px;
@@ -94,11 +94,14 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border-left: 5px solid #007bff;
             transition: transform 0.2s;
+            
+            /* Importante para posicionar el botón X dentro de la tarjeta */
+            position: relative; 
         }
 
         .task-card:hover { transform: translateY(-3px); }
 
-        .task-card h4 { margin: 0 0 8px 0; color: #222; }
+        .task-card h4 { margin: 0 0 8px 0; color: #222; padding-right: 20px; }
         .task-card p { font-size: 0.9em; color: #555; margin-bottom: 12px; }
 
         .badge-container {
@@ -115,6 +118,41 @@
             color: #495057;
             font-weight: 600;
         }
+
+        /* Estilo del botón "X" */
+        .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #dc3545; /* Rojo */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            
+            /* Centrar texto */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            /* Animación */
+            opacity: 0; /* Invisible por defecto */
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #a71d2a;
+            transform: scale(1.1);
+        }
+
+        /* Mostrar botón al pasar el mouse por la tarjeta */
+        .task-card:hover .delete-btn {
+            opacity: 1;
+        }
+
     </style>
 </head>
 <body>
