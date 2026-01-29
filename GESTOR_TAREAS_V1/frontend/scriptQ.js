@@ -1,30 +1,80 @@
 const API_URL = 'http://127.0.0.1:5000/tareas';
 
+// --- RENDERIZADO DEL TABLERO ---
 function actualizarTablero() {
     fetch(API_URL)
         .then(res => res.json())
         .then(tareas => {
-            ['list-to-do', 'list-in-progress', 'list-done'].forEach(id => document.getElementById(id).innerHTML = '');
+            const listas = {
+                'to do': document.getElementById('list-to-do'),
+                'in progress': document.getElementById('list-in-progress'),
+                'done': document.getElementById('list-done')
+            };
+
+            // Limpiar listas
+            Object.values(listas).forEach(lista => lista.innerHTML = '');
 
             tareas.forEach(t => {
                 const card = document.createElement('div');
                 card.className = 'task-card';
+                card.id = `task-${t.id}`;
+                card.draggable = true; // Habilitar Drag
+
+                // Eventos Drag
+                card.ondragstart = (e) => {
+                    e.dataTransfer.setData("text/plain", t.id);
+                    card.classList.add('dragging');
+                };
+                card.ondragend = () => card.classList.remove('dragging');
+
                 card.innerHTML = `
                     <button class="floating-btn delete-btn" onclick="eliminarTarea(${t.id})">✕</button>
                     <button class="floating-btn edit-btn" onclick="abrirModal(${t.id}, '${t.nombre}', ${t.dificultad}, '${t.asignado}')">✎</button>
                     <h4>${t.nombre}</h4>
                     <p>${t.descripcion}</p>
                     <div>
-                        <span class="badge">Dificultad: ${t.dificultad}</span>
+                        <span class="badge">Nivel: ${t.dificultad}</span>
                         <span class="badge">👤 ${t.asignado}</span>
                     </div>
                 `;
-                const listId = `list-${t.estado.replace(' ', '-')}`;
-                document.getElementById(listId).appendChild(card);
+                
+                if (listas[t.estado]) listas[t.estado].appendChild(card);
             });
         });
 }
 
+// --- FUNCIONES DRAG & DROP ---
+function allowDrop(e) { e.preventDefault(); }
+
+function dragEnter(e) {
+    const col = e.target.closest('.column');
+    if (col) col.classList.add('drag-over');
+}
+
+function dragLeave(e) {
+    const col = e.target.closest('.column');
+    if (col) col.classList.remove('drag-over');
+}
+
+function drop(e) {
+    e.preventDefault();
+    const col = e.target.closest('.column');
+    col.classList.remove('drag-over');
+    
+    const idTarea = e.dataTransfer.getData("text/plain");
+    const nuevoEstado = col.getAttribute('data-status');
+
+    // Actualizar en Backend
+    fetch(`${API_URL}/${idTarea}/estado`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ estado: nuevoEstado })
+    }).then(res => {
+        if(res.ok) actualizarTablero();
+    });
+}
+
+// --- OPERACIONES CRUD ---
 document.getElementById('task-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const data = {
@@ -42,7 +92,7 @@ document.getElementById('task-form').addEventListener('submit', (e) => {
 });
 
 function eliminarTarea(id) {
-    if(confirm('¿Borrar tarea?')) {
+    if(confirm('¿Eliminar definitivamente?')) {
         fetch(`${API_URL}/${id}`, { method: 'DELETE' }).then(() => actualizarTablero());
     }
 }
