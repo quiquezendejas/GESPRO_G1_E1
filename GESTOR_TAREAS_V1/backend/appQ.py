@@ -47,5 +47,4 @@ def crear_tarea():
     }), 201
 
 if __name__ == '__main__':
-    # El modo debug permite que el servidor se reinicie solo al detectar cambios
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000) 
