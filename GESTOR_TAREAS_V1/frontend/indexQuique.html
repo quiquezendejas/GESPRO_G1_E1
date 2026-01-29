@@ -3,68 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <title>Gestor de Tareas</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 15px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 6px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        hr {
+            margin: 30px 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 5px solid #007bff;
+            font-size: 15px;
+        }
+    </style>
 </head>
+
 <body>
 
-    <h2>Crear tarea</h2>
+    <div class="container">
+        <h2>Crear tarea</h2>
 
-    <!-- Nombre -->
-    <label>
-        Nombre de la tarea:
-        <input type="text" id="nombre">
-    </label>
-    <br><br>
+        <label>
+            Nombre de la tarea
+            <input type="text" id="nombre">
+        </label>
 
-    <!-- Descripción -->
-    <label>
-        Descripción:
-        <input type="text" id="descripcion">
-    </label>
-    <br><br>
+        <label>
+            Descripción
+            <input type="text" id="descripcion">
+        </label>
 
-    <!-- Dificultad -->
-    <label>
-        Dificultad:
-        <select id="dificultad">
-            <option value="">-- Selecciona --</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-        </select>
-    </label>
-    <br><br>
+        <label>
+            Dificultad
+            <select id="dificultad">
+                <option value="">-- Selecciona --</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </label>
 
-    <!-- Asignado -->
-    <label>
-        Asignado a:
-        <input type="text" id="asignado">
-    </label>
-    <br><br>
+        <label>
+            Asignado a
+            <input type="text" id="asignado">
+        </label>
 
-    <!-- Estado -->
-    <label>
-        Estado:
-        <select id="estado">
-            <option value="TO DO">TO DO</option>
-            <option value="IN PROGRESS">IN PROGRESS</option>
-            <option value="DONE">DONE</option>
-        </select>
-    </label>
-    <br><br>
+        <label>
+            Estado
+            <select id="estado">
+                <option value="TO DO">TO DO</option>
+                <option value="IN PROGRESS">IN PROGRESS</option>
+                <option value="DONE">DONE</option>
+            </select>
+        </label>
 
-    <button onclick="crearTarea()">Crear</button>
+        <button onclick="crearTarea()">Crear</button>
 
-    <hr>
+        <hr>
 
-    <h3>Listado de Tareas</h3>
-    <ul id="listaTareas"></ul>
+        <h3>Listado de Tareas</h3>
+        <ul id="listaTareas"></ul>
+    </div>
 
     <script src="scriptQuique.js"></script>
 </body>
