@@ -8,10 +8,55 @@
 
     <h2>Crear tarea</h2>
 
-    <input type="text" id="taskName" placeholder="Nombre de la tarea">
+    <!-- Nombre -->
+    <label>
+        Nombre de la tarea:
+        <input type="text" id="taskName">
+    </label>
+    <br><br>
+
+    <!-- Estimación -->
+    <label>
+        Estimación:
+        <select id="taskEstimation">
+            <option value="">-- Selecciona --</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+        </select>
+    </label>
+    <br><br>
+
+    <!-- Asignación -->
+    <label>
+        Asignado a:
+        <input type="text" id="taskAssignee">
+    </label>
+    <br><br>
+
+    <!-- Estado -->
+    <label>
+        Estado:
+        <select id="taskStatus">
+            <option value="TO DO">TO DO</option>
+            <option value="IN PROGRESS">IN PROGRESS</option>
+            <option value="DONE">DONE</option>
+        </select>
+    </label>
+    <br><br>
+
     <button onclick="createTask()">Crear</button>
 
-    <h3>Listado de tareas</h3>
+    <hr>
+
+    <h3>Listado de Tareas</h3>
     <ul id="taskList"></ul>
 
     <script src="scriptQuique.js"></script>
