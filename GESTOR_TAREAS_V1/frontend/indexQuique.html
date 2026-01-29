@@ -11,14 +11,21 @@
     <!-- Nombre -->
     <label>
         Nombre de la tarea:
-        <input type="text" id="taskName">
+        <input type="text" id="nombre">
     </label>
     <br><br>
 
-    <!-- Estimación -->
+    <!-- Descripción -->
     <label>
-        Estimación:
-        <select id="taskEstimation">
+        Descripción:
+        <input type="text" id="descripcion">
+    </label>
+    <br><br>
+
+    <!-- Dificultad -->
+    <label>
+        Dificultad:
+        <select id="dificultad">
             <option value="">-- Selecciona --</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -34,17 +41,17 @@
     </label>
     <br><br>
 
-    <!-- Asignación -->
+    <!-- Asignado -->
     <label>
         Asignado a:
-        <input type="text" id="taskAssignee">
+        <input type="text" id="asignado">
     </label>
     <br><br>
 
     <!-- Estado -->
     <label>
         Estado:
-        <select id="taskStatus">
+        <select id="estado">
             <option value="TO DO">TO DO</option>
             <option value="IN PROGRESS">IN PROGRESS</option>
             <option value="DONE">DONE</option>
@@ -52,12 +59,12 @@
     </label>
     <br><br>
 
-    <button onclick="createTask()">Crear</button>
+    <button onclick="crearTarea()">Crear</button>
 
     <hr>
 
     <h3>Listado de Tareas</h3>
-    <ul id="taskList"></ul>
+    <ul id="listaTareas"></ul>
 
     <script src="scriptQuique.js"></script>
 </body>

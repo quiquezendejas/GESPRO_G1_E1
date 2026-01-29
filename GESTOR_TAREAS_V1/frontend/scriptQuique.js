@@ -1,55 +1,81 @@
-const API_URL = "http://localhost:5000/tasks";
+console.log("JS cargado correctamente");
 
-function createTask() {
-    const name = document.getElementById("taskName").value;
-    const estimation = document.getElementById("taskEstimation").value;
-    const assignee = document.getElementById("taskAssignee").value;
-    const status = document.getElementById("taskStatus").value;
+const API_URL = "http://localhost:5000/tareas";
 
-    if (!name || !estimation || !assignee || !status) return;
+function crearTarea() {
+    console.log("Botón Crear presionado");
 
-    const task = {
-        name: name,
-        estimation: estimation,
-        assignee: assignee,
-        status: status
+    const nombre = document.getElementById("nombre").value.trim();
+    const descripcion = document.getElementById("descripcion").value.trim();
+    const dificultad = document.getElementById("dificultad").value;
+    const asignado = document.getElementById("asignado").value.trim();
+    const estado = document.getElementById("estado").value;
+
+    // Validación básica
+    if (!nombre || !descripcion || !dificultad || !asignado || !estado) {
+        alert("Completa todos los campos");
+        return;
+    }
+
+    const tarea = {
+        nombre: nombre,
+        descripcion: descripcion,
+        dificultad: Number(dificultad), // 🔴 MUY IMPORTANTE: número
+        asignado: asignado,
+        estado: estado
     };
+
+    console.log("Enviando tarea:", tarea);
 
     fetch(API_URL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(task)
+        body: JSON.stringify(tarea)
     })
-    .then(() => {
-        clearForm();
-        loadTasks();
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Error en la creación de la tarea");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Respuesta backend:", data);
+        limpiarFormulario();
+        cargarTareas();
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Error al crear la tarea. Revisa la consola.");
     });
 }
 
-function loadTasks() {
+function cargarTareas() {
     fetch(API_URL)
         .then(response => response.json())
-        .then(tasks => {
-            const list = document.getElementById("taskList");
-            list.innerHTML = "";
+        .then(tareas => {
+            const lista = document.getElementById("listaTareas");
+            lista.innerHTML = "";
 
-            tasks.forEach(task => {
+            tareas.forEach(tarea => {
                 const li = document.createElement("li");
-                li.textContent = `${task.name} (${task.estimation}) | ${task.assignee} | ${task.status}`;
-                list.appendChild(li);
+                li.textContent = `${tarea.nombre} (${tarea.dificultad}) | ${tarea.asignado} | ${tarea.estado}`;
+                lista.appendChild(li);
             });
+        })
+        .catch(error => {
+            console.error("Error cargando tareas:", error);
         });
 }
 
-function clearForm() {
-    document.getElementById("taskName").value = "";
-    document.getElementById("taskEstimation").value = "";
-    document.getElementById("taskAssignee").value = "";
-    document.getElementById("taskStatus").value = "TO DO";
+function limpiarFormulario() {
+    document.getElementById("nombre").value = "";
+    document.getElementById("descripcion").value = "";
+    document.getElementById("dificultad").value = "";
+    document.getElementById("asignado").value = "";
+    document.getElementById("estado").value = "TO DO";
 }
 
 // Cargar tareas al abrir la página
-
-loadTasks();
+cargarTareas();
