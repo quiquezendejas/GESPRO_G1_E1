@@ -4,7 +4,6 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# Base de datos temporal en memoria
 tareas = []
 
 @app.route('/tareas', methods=['GET'])
@@ -18,7 +17,7 @@ def crear_tarea():
         "id": len(tareas) + 1,
         "nombre": data.get('nombre'),
         "descripcion": data.get('descripcion'),
-        "dificultad": data.get('dificultad'),
+        "dificultad": int(data.get('dificultad', 0)), # Aseguramos que sea entero
         "asignado": data.get('asignado'),
         "estado": data.get('estado')
     }
@@ -37,12 +36,11 @@ def editar_tarea(id_tarea):
     for t in tareas:
         if t['id'] == id_tarea:
             t['nombre'] = data.get('nombre', t['nombre'])
-            t['dificultad'] = data.get('dificultad', t['dificultad'])
+            t['dificultad'] = int(data.get('dificultad', t['dificultad']))
             t['asignado'] = data.get('asignado', t['asignado'])
             return jsonify(t), 200
     return jsonify({"error": "No encontrada"}), 404
 
-# RUTA PARA ACTUALIZAR ESTADO (DRAG & DROP)
 @app.route('/tareas/<int:id_tarea>/estado', methods=['PATCH'])
 def actualizar_estado(id_tarea):
     nuevo_estado = request.get_json().get('estado')

@@ -7,25 +7,30 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; margin: 0; }
         h1 { text-align: center; color: #333; }
         
-        /* Formulario */
         .form-section { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         input, textarea, select { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         .btn-main { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
         
-        /* Kanban Layout */
         .kanban-board { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
         .column { 
             background: #ebedf0; border-radius: 8px; width: 300px; min-height: 500px; padding: 15px; 
             transition: background 0.2s, border 0.2s; border: 2px solid transparent;
         }
         
-        /* Efecto cuando pasas una tarea sobre la columna */
         .column.drag-over { background: #dfe3e6; border: 2px dashed #007bff; }
 
-        .column h3 { text-align: center; background: #343a40; color: white; margin: -15px -15px 15px; padding: 10px; border-radius: 8px 8px 0 0; pointer-events: none; }
+        .column h3 { 
+            display: flex; justify-content: space-between; align-items: center;
+            background: #343a40; color: white; margin: -15px -15px 15px; padding: 10px 15px; border-radius: 8px 8px 0 0; pointer-events: none; 
+        }
+        
+        /* Estilo para el contador de dificultad */
+        .difficulty-counter {
+            background: #6c757d; font-size: 0.75em; padding: 2px 8px; border-radius: 20px; font-weight: normal;
+        }
+
         .task-list { min-height: 450px; } 
 
-        /* Tarjetas */
         .task-card { 
             background: white; margin-bottom: 15px; padding: 15px; border-radius: 6px; 
             position: relative; border-left: 5px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
@@ -34,7 +39,6 @@
         .task-card:active { cursor: grabbing; }
         .task-card.dragging { opacity: 0.4; }
         
-        /* Botones Flotantes */
         .floating-btn { position: absolute; top: 8px; width: 26px; height: 26px; border-radius: 50%; border: none; color: white; cursor: pointer; opacity: 0; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 12px; }
         .task-card:hover .floating-btn { opacity: 1; }
         .delete-btn { right: 8px; background: #dc3545; }
@@ -42,14 +46,13 @@
         
         .badge { background: #e9ecef; padding: 3px 8px; border-radius: 10px; font-size: 0.7em; font-weight: bold; margin-right: 5px; }
 
-        /* Modal */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 20px; border-radius: 10px; width: 350px; }
     </style>
 </head>
 <body>
 
-    <h1>Panel Kanban Interactivo - GESPRO</h1>
+    <h1>Panel Kanban Master - Grupo 1</h1>
 
     <div class="form-section">
         <form id="task-form">
@@ -68,17 +71,17 @@
 
     <div class="kanban-board">
         <div class="column" data-status="to do" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
-            <h3>📝 Por Hacer</h3>
+            <h3>📝 Por Hacer <span class="difficulty-counter" id="sum-to-do">Dif: 0</span></h3>
             <div id="list-to-do" class="task-list"></div>
         </div>
 
         <div class="column" data-status="in progress" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
-            <h3>⚡ En Progreso</h3>
+            <h3>⚡ En Progreso <span class="difficulty-counter" id="sum-in-progress">Dif: 0</span></h3>
             <div id="list-in-progress" class="task-list"></div>
         </div>
 
         <div class="column" data-status="done" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
-            <h3>✅ Finalizado</h3>
+            <h3>✅ Finalizado <span class="difficulty-counter" id="sum-done">Dif: 0</span></h3>
             <div id="list-done" class="task-list"></div>
         </div>
     </div>

@@ -1,6 +1,5 @@
 const API_URL = 'http://127.0.0.1:5000/tareas';
 
-// --- RENDERIZADO DEL TABLERO ---
 function actualizarTablero() {
     fetch(API_URL)
         .then(res => res.json())
@@ -11,16 +10,26 @@ function actualizarTablero() {
                 'done': document.getElementById('list-done')
             };
 
+            const contadores = {
+                'to do': 0,
+                'in progress': 0,
+                'done': 0
+            };
+
             // Limpiar listas
             Object.values(listas).forEach(lista => lista.innerHTML = '');
 
             tareas.forEach(t => {
+                // Sumar dificultad al contador correspondiente
+                if (contadores.hasOwnProperty(t.estado)) {
+                    contadores[t.estado] += parseInt(t.dificultad || 0);
+                }
+
                 const card = document.createElement('div');
                 card.className = 'task-card';
                 card.id = `task-${t.id}`;
-                card.draggable = true; // Habilitar Drag
+                card.draggable = true;
 
-                // Eventos Drag
                 card.ondragstart = (e) => {
                     e.dataTransfer.setData("text/plain", t.id);
                     card.classList.add('dragging');
@@ -40,41 +49,34 @@ function actualizarTablero() {
                 
                 if (listas[t.estado]) listas[t.estado].appendChild(card);
             });
+
+            // Actualizar los textos de los contadores en el HTML
+            document.getElementById('sum-to-do').innerText = `Dif: ${contadores['to do']}`;
+            document.getElementById('sum-in-progress').innerText = `Dif: ${contadores['in progress']}`;
+            document.getElementById('sum-done').innerText = `Dif: ${contadores['done']}`;
         });
 }
 
 // --- FUNCIONES DRAG & DROP ---
 function allowDrop(e) { e.preventDefault(); }
-
-function dragEnter(e) {
-    const col = e.target.closest('.column');
-    if (col) col.classList.add('drag-over');
-}
-
-function dragLeave(e) {
-    const col = e.target.closest('.column');
-    if (col) col.classList.remove('drag-over');
-}
+function dragEnter(e) { const col = e.target.closest('.column'); if (col) col.classList.add('drag-over'); }
+function dragLeave(e) { const col = e.target.closest('.column'); if (col) col.classList.remove('drag-over'); }
 
 function drop(e) {
     e.preventDefault();
     const col = e.target.closest('.column');
     col.classList.remove('drag-over');
-    
     const idTarea = e.dataTransfer.getData("text/plain");
     const nuevoEstado = col.getAttribute('data-status');
 
-    // Actualizar en Backend
     fetch(`${API_URL}/${idTarea}/estado`, {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ estado: nuevoEstado })
-    }).then(res => {
-        if(res.ok) actualizarTablero();
-    });
+    }).then(res => { if(res.ok) actualizarTablero(); });
 }
 
-// --- OPERACIONES CRUD ---
+// --- CRUD ---
 document.getElementById('task-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const data = {
@@ -92,7 +94,7 @@ document.getElementById('task-form').addEventListener('submit', (e) => {
 });
 
 function eliminarTarea(id) {
-    if(confirm('¿Eliminar definitivamente?')) {
+    if(confirm('¿Eliminar tarea?')) {
         fetch(`${API_URL}/${id}`, { method: 'DELETE' }).then(() => actualizarTablero());
     }
 }
