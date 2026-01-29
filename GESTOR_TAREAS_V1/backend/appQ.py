@@ -17,7 +17,7 @@ def crear_tarea():
         "id": len(tareas) + 1,
         "nombre": data.get('nombre'),
         "descripcion": data.get('descripcion'),
-        "dificultad": int(data.get('dificultad', 0)), # Aseguramos que sea entero
+        "dificultad": int(data.get('dificultad', 0)),
         "asignado": data.get('asignado'),
         "estado": data.get('estado')
     }

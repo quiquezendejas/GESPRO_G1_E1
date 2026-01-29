@@ -10,17 +10,15 @@ function actualizarTablero() {
                 'done': document.getElementById('list-done')
             };
 
-            const contadores = {
-                'to do': 0,
-                'in progress': 0,
-                'done': 0
-            };
+            const contadores = { 'to do': 0, 'in progress': 0, 'done': 0 };
 
             // Limpiar listas
             Object.values(listas).forEach(lista => lista.innerHTML = '');
 
+            // --- PASO CLAVE: Ordenar de Mayor a Menor dificultad ---
+            tareas.sort((a, b) => b.dificultad - a.dificultad);
+
             tareas.forEach(t => {
-                // Sumar dificultad al contador correspondiente
                 if (contadores.hasOwnProperty(t.estado)) {
                     contadores[t.estado] += parseInt(t.dificultad || 0);
                 }
@@ -42,7 +40,7 @@ function actualizarTablero() {
                     <h4>${t.nombre}</h4>
                     <p>${t.descripcion}</p>
                     <div>
-                        <span class="badge">Nivel: ${t.dificultad}</span>
+                        <span class="badge badge-priority">🔥 Dificultad: ${t.dificultad}</span>
                         <span class="badge">👤 ${t.asignado}</span>
                     </div>
                 `;
@@ -50,14 +48,14 @@ function actualizarTablero() {
                 if (listas[t.estado]) listas[t.estado].appendChild(card);
             });
 
-            // Actualizar los textos de los contadores en el HTML
+            // Actualizar contadores
             document.getElementById('sum-to-do').innerText = `Dif: ${contadores['to do']}`;
             document.getElementById('sum-in-progress').innerText = `Dif: ${contadores['in progress']}`;
             document.getElementById('sum-done').innerText = `Dif: ${contadores['done']}`;
         });
 }
 
-// --- FUNCIONES DRAG & DROP ---
+// --- DRAG & DROP ---
 function allowDrop(e) { e.preventDefault(); }
 function dragEnter(e) { const col = e.target.closest('.column'); if (col) col.classList.add('drag-over'); }
 function dragLeave(e) { const col = e.target.closest('.column'); if (col) col.classList.remove('drag-over'); }
@@ -94,7 +92,7 @@ document.getElementById('task-form').addEventListener('submit', (e) => {
 });
 
 function eliminarTarea(id) {
-    if(confirm('¿Eliminar tarea?')) {
+    if(confirm('¿Borrar tarea?')) {
         fetch(`${API_URL}/${id}`, { method: 'DELETE' }).then(() => actualizarTablero());
     }
 }
