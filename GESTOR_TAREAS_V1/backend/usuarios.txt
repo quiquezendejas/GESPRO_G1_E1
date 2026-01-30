@@ -1,4 +1,4 @@
-sergio:1234:Sergio Tulio Hernandez Aceves:Product Owner
-miriam:1234:Miriam González Vázquez:normal
-omar:1234:Omar Yair Villanueva Rodrígez:normal
-diego:1234:Diego Enrique Zendejas Salazar:normal
+sergio:G1E1_2026:Sergio Tulio Hernandez Aceves:Product Owner
+miriam:G1E1_2026:Miriam González Vázquez:Product Owner
+omar:G1E1_2026:Omar Yair Villanueva Rodrígez:Product Owner
+diego:G1E1_2026:Diego Enrique Zendejas Salazar:Product Owner
