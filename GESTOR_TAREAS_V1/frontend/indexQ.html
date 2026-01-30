@@ -4,31 +4,25 @@
     <meta charset="UTF-8">
     <title>GESPRO G1_E1 - Kanban Master</title>
     <style>
-        /* Conservamos tu diseño original */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; margin: 0; }
         #login-screen { position: fixed; inset: 0; background: #f4f7f6; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 300px; text-align: center; }
-        .form-section { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-section { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none; }
         .form-section h2 { text-align: center; margin-top: 0; color: #333; font-size: 1.2em; border-bottom: 2px solid #f4f7f6; padding-bottom: 10px; }
         input, textarea, select { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         .btn-main { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .btn-guest { background: #6c757d; margin-top: 10px; }
         .kanban-board { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-        .column { background: #ebedf0; border-radius: 8px; width: 300px; min-height: 500px; padding: 15px; border: 2px solid transparent; transition: 0.2s; position: relative; }
-        .column.drag-over { background: #dfe3e6; border: 2px dashed #007bff; }
+        .column { background: #ebedf0; border-radius: 8px; width: 300px; min-height: 500px; padding: 15px; position: relative; }
         .column h3 { text-align: center; background: #343a40; color: white; margin: -15px -15px 15px; padding: 10px; border-radius: 8px 8px 0 0; }
         .wip-header-control { background: #fff; padding: 5px; border-radius: 5px; margin-bottom: 10px; font-size: 0.8em; border: 1px solid #ccc; }
-        .wip-counter { display: block; font-size: 0.7em; margin-top: 5px; font-weight: bold; }
-        .task-card { background: white; margin-bottom: 15px; padding: 15px; border-radius: 6px; position: relative; border-left: 5px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: grab; }
+        .task-card { background: white; margin-bottom: 15px; padding: 15px; border-radius: 6px; position: relative; border-left: 5px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .floating-btn { position: absolute; top: 8px; border-radius: 50%; border: none; color: white; cursor: pointer; opacity: 0; transition: 0.2s; width: 26px; height: 26px; }
         .task-card:hover .floating-btn { opacity: 1; }
         .delete-btn { right: 8px; background: #dc3545; }
         .edit-btn { right: 38px; background: #007bff; }
         .badge { background: #e9ecef; padding: 3px 8px; border-radius: 10px; font-size: 0.75em; font-weight: bold; margin-right: 5px; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
-        
-        /* Clase para ocultar el formulario a invitados */
-        .po-only { display: none; }
     </style>
 </head>
 <body>
@@ -39,80 +33,77 @@
             <input type="text" id="l-user" placeholder="Usuario">
             <input type="password" id="l-pass" placeholder="Contraseña">
             <button onclick="intentarLogin()" class="btn-main">Entrar</button>
-            <button onclick="entrarComoInvitado()" class="btn-main btn-guest">Entrar como Invitado</button>
-            <p id="l-err" style="color:red; display:none; margin-top:10px;">Credenciales incorrectas</p>
+            <button onclick="entrarComoInvitado()" class="btn-main btn-guest">Invitado</button>
+            <p id="l-err" style="color:red; display:none;">Credenciales incorrectas</p>
         </div>
     </div>
 
     <div id="app-container" style="display:none;">
         <div style="text-align:right; margin-bottom:20px;">
-            <span>👤 <b id="u-name"></b> | 🚀 <b id="u-team"></b></span>
+            <span>👤 <b id="u-name"></b> | <span id="u-rol-display"></span></span>
             <button onclick="logout()" style="color:red; border:none; background:none; cursor:pointer;">(Salir)</button>
         </div>
 
-        <div class="form-section po-only" id="form-crear">
+        <div class="form-section" id="form-crear">
             <h2>Nueva Tarea</h2>
             <form id="task-form">
-                <input type="text" id="nombre" placeholder="Nombre de la tarea" required>
+                <input type="text" id="nombre" placeholder="Nombre" required>
                 <textarea id="descripcion" placeholder="Descripción" required></textarea>
-                <input type="number" id="dificultad" placeholder="Dificultad (1-10)" min="1" max="10" value="5">
+                <input type="number" id="dificultad" min="1" max="10" value="5">
                 <select id="estado">
                     <option value="to do">Por Hacer</option>
                     <option value="in progress">En Progreso</option>
                     <option value="done">Finalizado</option>
                 </select>
                 <select id="asignado" required>
-                    <option value="" disabled selected>Asignar a integrante...</option>
-                    <option value="Sergio Tulio Hernandez Aceves">Sergio Tulio Hernandez Aceves</option>
-                    <option value="Miriam González Vázquez">Miriam González Vázquez</option>
-                    <option value="Omar Yair Villanueva Rodrígez">Omar Yair Villanueva Rodrígez</option>
-                    <option value="Diego Enrique Zendejas Salazar">Diego Enrique Zendejas Salazar</option>
+                    <option value="Sergio Hernandez">Sergio Hernandez</option>
+                    <option value="Miriam González">Miriam González</option>
+                    <option value="Omar Villanueva">Omar Villanueva</option>
+                    <option value="Diego Salazar">Diego Salazar</option>
                 </select>
                 <button type="submit" class="btn-main">Añadir al Tablero</button>
             </form>
         </div>
 
         <div class="kanban-board">
-            <div class="column" data-status="to do" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
+            <div class="column" data-status="to do" ondragover="allowDrop(event)" ondrop="drop(event)">
                 <h3>📝 Por Hacer</h3>
-                <div id="list-to-do" class="task-list"></div>
+                <div id="list-to-do"></div>
             </div>
-
-            <div class="column" data-status="in progress" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
+            <div class="column" data-status="in progress" ondragover="allowDrop(event)" ondrop="drop(event)">
                 <h3>⚡ En Progreso</h3>
                 <div class="wip-header-control">
-                    <label>Límite WIP: </label>
-                    <select id="wip-limit-select" onchange="actualizarTablero()" style="width: 60px; margin-bottom:0; padding:2px;">
+                    Límite WIP: 
+                    <select id="wip-limit-select" onchange="actualizarTablero()">
                         <option value="10">10</option>
                         <option value="20" selected>20</option>
                         <option value="30">30</option>
                     </select>
-                    <span id="wip-status" class="wip-counter">Carga: 0 / 20</span>
+                    <span id="wip-status" style="display:block; font-weight:bold;">Carga: 0 / 20</span>
                 </div>
-                <div id="list-in-progress" class="task-list"></div>
+                <div id="list-in-progress"></div>
             </div>
-
-            <div class="column" data-status="done" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
+            <div class="column" data-status="done" ondragover="allowDrop(event)" ondrop="drop(event)">
                 <h3>✅ Finalizado</h3>
-                <div id="list-done" class="task-list"></div>
+                <div id="list-done"></div>
             </div>
         </div>
     </div>
 
     <div id="edit-modal" class="modal">
-        <div style="background:white; padding:20px; border-radius:10px; width:350px;">
-            <h3>✏️ Editar Tarea</h3>
+        <div style="background:white; padding:20px; border-radius:10px; width:300px;">
+            <h3>Editar Tarea</h3>
             <input type="hidden" id="edit-id">
-            <input type="text" id="edit-nombre" placeholder="Nombre">
-            <input type="number" id="edit-dificultad" placeholder="Dificultad">
+            <input type="text" id="edit-nombre">
+            <input type="number" id="edit-dificultad">
             <select id="edit-asignado">
-                <option value="Sergio Tulio Hernandez Aceves">Sergio Tulio Hernandez Aceves</option>
-                <option value="Miriam González Vázquez">Miriam González Vázquez</option>
-                <option value="Omar Yair Villanueva Rodrígez">Omar Yair Villanueva Rodrígez</option>
-                <option value="Diego Enrique Zendejas Salazar">Diego Enrique Zendejas Salazar</option>
+                <option value="Sergio Hernandez">Sergio Hernandez</option>
+                <option value="Miriam González">Miriam González</option>
+                <option value="Omar Villanueva">Omar Villanueva</option>
+                <option value="Diego Salazar">Diego Salazar</option>
             </select>
             <button onclick="guardarEdicion()" class="btn-main">Guardar</button>
-            <button onclick="cerrarModal()" style="width:100%; border:none; margin-top:5px; cursor:pointer; background:#eee; padding:10px;">Cancelar</button>
+            <button onclick="cerrarModal()" class="btn-main btn-guest">Cancelar</button>
         </div>
     </div>
 

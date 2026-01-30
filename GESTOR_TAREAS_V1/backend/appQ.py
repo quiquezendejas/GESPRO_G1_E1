@@ -25,14 +25,14 @@ def validar_usuario(user, password):
         for linea in f:
             partes = linea.strip().split(':')
             if len(partes) == 4 and partes[0] == user and partes[1] == password:
-                return {"nombre": partes[2], "equipo": partes[3]}
+                return {"nombre": partes[2], "rol": partes[3], "equipo": "G1_E1"}
     return None
 
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     u_info = validar_usuario(data.get('user'), data.get('password'))
-    return jsonify(u_info) if u_info else (jsonify({"error": "Error"}), 401)
+    return jsonify(u_info) if u_info else (jsonify({"error": "No autorizado"}), 401)
 
 @app.route('/tareas', methods=['GET'])
 def obtener_tareas():

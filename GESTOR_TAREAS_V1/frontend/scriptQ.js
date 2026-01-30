@@ -1,12 +1,9 @@
 const BASE_URL = 'http://127.0.0.1:5000';
-let tareasLocales = [];
 let usuarioActual = null;
+let tareasLocales = [];
 
-// --- LOGIN ---
 function entrarComoInvitado() {
-    const data = { nombre: "Invitado", equipo: "Visitante", rol: "invitado" };
-    localStorage.setItem('sesion_g1', JSON.stringify(data));
-    mostrarApp(data);
+    mostrarApp({ nombre: "Invitado", rol: "invitado", equipo: "G1_E1" });
 }
 
 function intentarLogin() {
@@ -19,7 +16,6 @@ function intentarLogin() {
     })
     .then(res => res.ok ? res.json() : Promise.reject())
     .then(data => {
-        data.rol = "po"; // Product Owner
         localStorage.setItem('sesion_g1', JSON.stringify(data));
         mostrarApp(data);
     })
@@ -31,15 +27,20 @@ function mostrarApp(data) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-container').style.display = 'block';
     document.getElementById('u-name').innerText = data.nombre;
-    document.getElementById('u-team').innerText = data.equipo;
+    document.getElementById('u-rol-display').innerText = `Rol: ${data.rol}`;
 
-    const esPO = (data.rol === "po");
-    // Mostrar formulario solo a PO
-    document.getElementById('form-crear').style.display = esPO ? 'block' : 'none';
-    // Bloquear WIP a Invitados
+    const esPO = data.rol === "Product Owner";
+    const esNormal = data.rol === "normal";
+    const esInvitado = data.rol === "invitado";
+
+    // 1. Mostrar formulario si es PO o Normal
+    document.getElementById('form-crear').style.display = (esPO || esNormal) ? 'block' : 'none';
+
+    // 2. Bloquear WIP select si NO es Product Owner
     const wipSelect = document.getElementById('wip-limit-select');
     wipSelect.disabled = !esPO;
     wipSelect.style.cursor = esPO ? "pointer" : "not-allowed";
+    wipSelect.style.backgroundColor = esPO ? "#fff" : "#eee";
 
     actualizarTablero();
 }
@@ -51,14 +52,13 @@ function actualizarTablero() {
         Object.values(listas).forEach(id => document.getElementById(id).innerHTML = '');
 
         let difProgreso = 0;
-        const esPO = (usuarioActual.rol === "po");
+        const puedeGestionar = (usuarioActual.rol === "Product Owner" || usuarioActual.rol === "normal");
 
         tareas.forEach(t => {
             const card = document.createElement('div');
             card.className = 'task-card';
             
-            // Si es PO, habilitamos drag y botones de acción
-            if (esPO) {
+            if (puedeGestionar) {
                 card.draggable = true;
                 card.ondragstart = (e) => e.dataTransfer.setData("text", t.id);
                 card.innerHTML = `
@@ -67,10 +67,8 @@ function actualizarTablero() {
                 `;
             }
 
-            card.innerHTML += `
-                <h4>${t.nombre}</h4><p>${t.descripcion}</p>
-                <div><span class="badge">Dif: ${t.dificultad}</span><span class="badge">👤 ${t.asignado.split(' ')[0]}</span></div>
-            `;
+            card.innerHTML += `<h4>${t.nombre}</h4><p>${t.descripcion}</p>
+                <div><span class="badge">Dif: ${t.dificultad}</span><span class="badge">👤 ${t.asignado.split(' ')[0]}</span></div>`;
             
             if (t.estado === 'in progress') difProgreso += Number(t.dificultad);
             document.getElementById(listas[t.estado]).appendChild(card);
@@ -78,12 +76,12 @@ function actualizarTablero() {
 
         const limit = Number(document.getElementById('wip-limit-select').value);
         const status = document.getElementById('wip-status');
-        status.innerText = `Carga: ${difProgreso} / ${limit} (Tol: ${(limit*1.1).toFixed(1)})`;
+        status.innerText = `Carga: ${difProgreso} / ${limit}`;
         status.style.color = difProgreso > limit * 1.1 ? 'red' : (difProgreso > limit ? 'orange' : 'green');
     });
 }
 
-// --- CRUD OPERACIONES ---
+// Operaciones CRUD
 document.getElementById('task-form').onsubmit = (e) => {
     e.preventDefault();
     const data = {
@@ -97,16 +95,11 @@ document.getElementById('task-form').onsubmit = (e) => {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
-    }).then(() => {
-        e.target.reset();
-        actualizarTablero();
-    });
+    }).then(() => { e.target.reset(); actualizarTablero(); });
 };
 
 function eliminarTarea(id) {
-    if(confirm('¿Eliminar tarea?')) {
-        fetch(`${BASE_URL}/tareas/${id}`, { method: 'DELETE' }).then(actualizarTablero);
-    }
+    if(confirm('¿Borrar tarea?')) fetch(`${BASE_URL}/tareas/${id}`, { method: 'DELETE' }).then(actualizarTablero);
 }
 
 function abrirModal(id, nom, dif, asig) {
@@ -130,26 +123,14 @@ function guardarEdicion() {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
-    }).then(() => {
-        cerrarModal();
-        actualizarTablero();
-    });
+    }).then(() => { cerrarModal(); actualizarTablero(); });
 }
 
-// --- DRAG & DROP ---
-function allowDrop(e) { if (usuarioActual.rol === "po") e.preventDefault(); }
-function dragEnter(e) { if (usuarioActual.rol === "po") e.target.closest('.column')?.classList.add('drag-over'); }
-function dragLeave(e) { e.target.closest('.column')?.classList.remove('drag-over'); }
-
+function allowDrop(e) { if (usuarioActual.rol !== "invitado") e.preventDefault(); }
 function drop(e) {
-    e.preventDefault();
-    const col = e.target.closest('.column');
-    col.classList.remove('drag-over');
-    if (usuarioActual.rol !== "po") return;
-
+    if (usuarioActual.rol === "invitado") return;
     const id = e.dataTransfer.getData("text");
-    const nuevoEstado = col.getAttribute('data-status');
-
+    const nuevoEstado = e.target.closest('.column').getAttribute('data-status');
     fetch(`${BASE_URL}/tareas/${id}/estado`, {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'},
