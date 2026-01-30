@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>GESPRO G1_E1 - Kanban Master</title>
     <style>
+        /* Conservamos tu diseño original */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; margin: 0; }
         #login-screen { position: fixed; inset: 0; background: #f4f7f6; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 300px; text-align: center; }
@@ -11,6 +12,7 @@
         .form-section h2 { text-align: center; margin-top: 0; color: #333; font-size: 1.2em; border-bottom: 2px solid #f4f7f6; padding-bottom: 10px; }
         input, textarea, select { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         .btn-main { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-guest { background: #6c757d; margin-top: 10px; }
         .kanban-board { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
         .column { background: #ebedf0; border-radius: 8px; width: 300px; min-height: 500px; padding: 15px; border: 2px solid transparent; transition: 0.2s; position: relative; }
         .column.drag-over { background: #dfe3e6; border: 2px dashed #007bff; }
@@ -24,6 +26,9 @@
         .edit-btn { right: 38px; background: #007bff; }
         .badge { background: #e9ecef; padding: 3px 8px; border-radius: 10px; font-size: 0.75em; font-weight: bold; margin-right: 5px; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
+        
+        /* Clase para ocultar el formulario a invitados */
+        .po-only { display: none; }
     </style>
 </head>
 <body>
@@ -34,6 +39,7 @@
             <input type="text" id="l-user" placeholder="Usuario">
             <input type="password" id="l-pass" placeholder="Contraseña">
             <button onclick="intentarLogin()" class="btn-main">Entrar</button>
+            <button onclick="entrarComoInvitado()" class="btn-main btn-guest">Entrar como Invitado</button>
             <p id="l-err" style="color:red; display:none; margin-top:10px;">Credenciales incorrectas</p>
         </div>
     </div>
@@ -44,7 +50,7 @@
             <button onclick="logout()" style="color:red; border:none; background:none; cursor:pointer;">(Salir)</button>
         </div>
 
-        <div class="form-section">
+        <div class="form-section po-only" id="form-crear">
             <h2>Nueva Tarea</h2>
             <form id="task-form">
                 <input type="text" id="nombre" placeholder="Nombre de la tarea" required>
@@ -97,8 +103,8 @@
         <div style="background:white; padding:20px; border-radius:10px; width:350px;">
             <h3>✏️ Editar Tarea</h3>
             <input type="hidden" id="edit-id">
-            <input type="text" id="edit-nombre">
-            <input type="number" id="edit-dificultad">
+            <input type="text" id="edit-nombre" placeholder="Nombre">
+            <input type="number" id="edit-dificultad" placeholder="Dificultad">
             <select id="edit-asignado">
                 <option value="Sergio Tulio Hernandez Aceves">Sergio Tulio Hernandez Aceves</option>
                 <option value="Miriam González Vázquez">Miriam González Vázquez</option>
