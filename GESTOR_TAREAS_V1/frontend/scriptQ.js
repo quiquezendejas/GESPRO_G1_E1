@@ -1,6 +1,7 @@
 const API_URL = 'http://127.0.0.1:5000/tareas';
 let tareasLocales = []; 
 
+// 1. RENDERIZADO Y ACTUALIZACIÓN VISUAL
 function actualizarTablero() {
     fetch(API_URL)
         .then(res => res.json())
@@ -40,19 +41,31 @@ function actualizarTablero() {
                 `;
                 
                 if (t.estado === 'in progress') {
-                    difAcumulada += Number(t.dificultad); // Conversión explícita
+                    difAcumulada += Number(t.dificultad);
                 }
                 
                 if (listas[t.estado]) listas[t.estado].appendChild(card);
             });
 
-            const limit = Number(document.getElementById('wip-limit-select').value);
+            // --- LÓGICA VISUAL DE TOLERANCIA ---
+            const limitBase = Number(document.getElementById('wip-limit-select').value);
+            const limiteConTolerancia = limitBase * 1.10; // +10%
             const statusEl = document.getElementById('wip-status');
-            statusEl.innerText = `Dificultad: ${difAcumulada} / ${limit}`;
-            statusEl.style.color = difAcumulada >= limit ? '#ff4d4d' : '#28a745';
+            
+            statusEl.innerText = `Carga: ${difAcumulada} / ${limitBase} (Tol: ${limiteConTolerancia.toFixed(1)})`;
+
+            // Cambiar color según el estado de la carga
+            if (difAcumulada > limiteConTolerancia) {
+                statusEl.style.color = '#ff4d4d'; // Rojo: Excedido totalmente
+            } else if (difAcumulada > limitBase) {
+                statusEl.style.color = '#ffa500'; // Naranja: En zona de tolerancia
+            } else {
+                statusEl.style.color = '#28a745'; // Verde: Dentro del límite base
+            }
         });
 }
 
+// 2. VALIDACIÓN DEL DRAG & DROP CON TOLERANCIA
 function allowDrop(e) { e.preventDefault(); }
 function dragEnter(e) { const col = e.target.closest('.column'); if (col) col.classList.add('drag-over'); }
 function dragLeave(e) { const col = e.target.closest('.column'); if (col) col.classList.remove('drag-over'); }
@@ -68,21 +81,21 @@ function drop(e) {
     if (nuevoEstado === 'in progress') {
         const tareaMoviendo = tareasLocales.find(t => t.id == idTarea);
         
-        // Solo validamos si la tarea NO estaba ya en 'in progress'
         if (tareaMoviendo && tareaMoviendo.estado !== 'in progress') {
-            
-            // Calculamos la suma actual de lo que ya hay en la columna
             const sumaActual = tareasLocales
                 .filter(t => t.estado === 'in progress')
                 .reduce((acc, t) => acc + Number(t.dificultad), 0);
             
-            const limiteWIP = Number(document.getElementById('wip-limit-select').value);
+            const limitBase = Number(document.getElementById('wip-limit-select').value);
+            const limiteRealMaximo = limitBase * 1.10; // Límite final con el 10% extra
             const dificultadTarea = Number(tareaMoviendo.dificultad);
 
-            console.log(`Validando: Actual(${sumaActual}) + Nueva(${dificultadTarea}) vs Límite(${limiteWIP})`);
-
-            if (sumaActual + dificultadTarea > limiteWIP) {
-                alert(`⚠️ No se puede mover: La carga actual es ${sumaActual}. Esta tarea suma ${dificultadTarea}, excediendo el límite de ${limiteWIP}.`);
+            if (sumaActual + dificultadTarea > limiteRealMaximo) {
+                alert(`⚠️ Movimiento bloqueado:
+                Carga actual: ${sumaActual}
+                Dificultad tarea: ${dificultadTarea}
+                Total: ${sumaActual + dificultadTarea}
+                El límite máximo permitido (incluyendo 10% tolerancia) es ${limiteRealMaximo.toFixed(1)}.`);
                 return;
             }
         }
@@ -95,8 +108,7 @@ function drop(e) {
     }).then(res => { if(res.ok) actualizarTablero(); });
 }
 
-// --- FORMULARIOS ---
-
+// 3. OTRAS OPERACIONES (Crear, Eliminar, Editar)
 document.getElementById('task-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const data = {
@@ -114,7 +126,7 @@ document.getElementById('task-form').addEventListener('submit', (e) => {
 });
 
 function eliminarTarea(id) {
-    if(confirm('¿Borrar?')) fetch(`${API_URL}/${id}`, { method: 'DELETE' }).then(() => actualizarTablero());
+    if(confirm('¿Borrar tarea?')) fetch(`${API_URL}/${id}`, { method: 'DELETE' }).then(() => actualizarTablero());
 }
 
 function abrirModal(id, nombre, dif, asig) {
