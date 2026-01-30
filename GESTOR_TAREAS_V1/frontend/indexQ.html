@@ -7,24 +7,16 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; margin: 0; }
         #login-screen { position: fixed; inset: 0; background: #f4f7f6; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 300px; text-align: center; }
-        
-        /* Estilo Formulario */
         .form-section { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .form-section h2 { text-align: center; margin-top: 0; color: #333; font-size: 1.2em; border-bottom: 2px solid #f4f7f6; padding-bottom: 10px; }
-        
         input, textarea, select { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         .btn-main { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        
-        /* Tablero */
         .kanban-board { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
         .column { background: #ebedf0; border-radius: 8px; width: 300px; min-height: 500px; padding: 15px; border: 2px solid transparent; transition: 0.2s; position: relative; }
         .column.drag-over { background: #dfe3e6; border: 2px dashed #007bff; }
         .column h3 { text-align: center; background: #343a40; color: white; margin: -15px -15px 15px; padding: 10px; border-radius: 8px 8px 0 0; }
-        
-        /* WIP Selector dentro de columna */
         .wip-header-control { background: #fff; padding: 5px; border-radius: 5px; margin-bottom: 10px; font-size: 0.8em; border: 1px solid #ccc; }
         .wip-counter { display: block; font-size: 0.7em; margin-top: 5px; font-weight: bold; }
-
         .task-card { background: white; margin-bottom: 15px; padding: 15px; border-radius: 6px; position: relative; border-left: 5px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: grab; }
         .floating-btn { position: absolute; top: 8px; border-radius: 50%; border: none; color: white; cursor: pointer; opacity: 0; transition: 0.2s; width: 26px; height: 26px; }
         .task-card:hover .floating-btn { opacity: 1; }
@@ -63,7 +55,13 @@
                     <option value="in progress">En Progreso</option>
                     <option value="done">Finalizado</option>
                 </select>
-                <input type="text" id="asignado" placeholder="Asignado a..." required>
+                <select id="asignado" required>
+                    <option value="" disabled selected>Asignar a integrante...</option>
+                    <option value="Sergio Tulio Hernandez Aceves">Sergio Tulio Hernandez Aceves</option>
+                    <option value="Miriam González Vázquez">Miriam González Vázquez</option>
+                    <option value="Omar Yair Villanueva Rodrígez">Omar Yair Villanueva Rodrígez</option>
+                    <option value="Diego Enrique Zendejas Salazar">Diego Enrique Zendejas Salazar</option>
+                </select>
                 <button type="submit" class="btn-main">Añadir al Tablero</button>
             </form>
         </div>
@@ -101,7 +99,12 @@
             <input type="hidden" id="edit-id">
             <input type="text" id="edit-nombre">
             <input type="number" id="edit-dificultad">
-            <input type="text" id="edit-asignado">
+            <select id="edit-asignado">
+                <option value="Sergio Tulio Hernandez Aceves">Sergio Tulio Hernandez Aceves</option>
+                <option value="Miriam González Vázquez">Miriam González Vázquez</option>
+                <option value="Omar Yair Villanueva Rodrígez">Omar Yair Villanueva Rodrígez</option>
+                <option value="Diego Enrique Zendejas Salazar">Diego Enrique Zendejas Salazar</option>
+            </select>
             <button onclick="guardarEdicion()" class="btn-main">Guardar</button>
             <button onclick="cerrarModal()" style="width:100%; border:none; margin-top:5px; cursor:pointer; background:#eee; padding:10px;">Cancelar</button>
         </div>
