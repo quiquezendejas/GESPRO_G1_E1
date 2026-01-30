@@ -1,0 +1,4 @@
+sergio:G1E1_2026:Sergio Tulio Hernandez Aceves:G1_E1
+miriam:G1E1_2026:Miriam González Vázquez:G1_E1
+omar:G1E1_2026:Omar Yair Villanueva Rodrígez:G1_E1
+diego:G1E1_2026:Diego Enrique Zendejas Salazar:G1_E1

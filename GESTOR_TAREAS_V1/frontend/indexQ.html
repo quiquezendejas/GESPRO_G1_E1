@@ -2,102 +2,108 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>GESPRO G1_E1 - Kanban WIP Limit</title>
+    <title>GESPRO G1_E1 - Kanban Master</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; margin: 0; }
-        h1 { text-align: center; color: #333; }
+        #login-screen { position: fixed; inset: 0; background: #f4f7f6; z-index: 2000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 300px; text-align: center; }
         
+        /* Estilo Formulario */
         .form-section { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .form-section h2 { text-align: center; margin-top: 0; color: #333; font-size: 1.2em; border-bottom: 2px solid #f4f7f6; padding-bottom: 10px; }
+        
         input, textarea, select { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         .btn-main { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
         
-        .wip-container { text-align: center; margin-bottom: 20px; }
-        .wip-box { background: #fff; padding: 10px 20px; border-radius: 8px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-
+        /* Tablero */
         .kanban-board { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-        .column { background: #ebedf0; border-radius: 8px; width: 300px; min-height: 500px; padding: 15px; border: 2px solid transparent; transition: 0.2s; }
+        .column { background: #ebedf0; border-radius: 8px; width: 300px; min-height: 500px; padding: 15px; border: 2px solid transparent; transition: 0.2s; position: relative; }
         .column.drag-over { background: #dfe3e6; border: 2px dashed #007bff; }
-        
         .column h3 { text-align: center; background: #343a40; color: white; margin: -15px -15px 15px; padding: 10px; border-radius: 8px 8px 0 0; }
-        .wip-counter { display: block; font-size: 0.6em; margin-top: 5px; font-weight: bold; }
-
-        .task-list { min-height: 450px; } 
+        
+        /* WIP Selector dentro de columna */
+        .wip-header-control { background: #fff; padding: 5px; border-radius: 5px; margin-bottom: 10px; font-size: 0.8em; border: 1px solid #ccc; }
+        .wip-counter { display: block; font-size: 0.7em; margin-top: 5px; font-weight: bold; }
 
         .task-card { background: white; margin-bottom: 15px; padding: 15px; border-radius: 6px; position: relative; border-left: 5px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: grab; }
-        .task-card.dragging { opacity: 0.4; }
-        
-        .floating-btn { position: absolute; top: 8px; width: 26px; height: 26px; border-radius: 50%; border: none; color: white; cursor: pointer; opacity: 0; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .floating-btn { position: absolute; top: 8px; border-radius: 50%; border: none; color: white; cursor: pointer; opacity: 0; transition: 0.2s; width: 26px; height: 26px; }
         .task-card:hover .floating-btn { opacity: 1; }
         .delete-btn { right: 8px; background: #dc3545; }
         .edit-btn { right: 38px; background: #007bff; }
-        
         .badge { background: #e9ecef; padding: 3px 8px; border-radius: 10px; font-size: 0.75em; font-weight: bold; margin-right: 5px; }
-
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 350px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
     </style>
 </head>
 <body>
 
-    <h1>Kanban Dashboard - Grupo 1</h1>
-
-    <div class="form-section">
-        <form id="task-form">
-            <input type="text" id="nombre" placeholder="Nombre de la tarea" required>
-            <textarea id="descripcion" placeholder="Descripción" required></textarea>
-            <input type="number" id="dificultad" placeholder="Dificultad (1-10)" min="1" max="10" value="5">
-            <select id="estado">
-                <option value="to do">Por Hacer</option>
-                <option value="in progress">En Progreso</option>
-                <option value="done">Finalizado</option>
-            </select>
-            <input type="text" id="asignado" placeholder="Asignado a..." required>
-            <button type="submit" class="btn-main">Añadir al Tablero</button>
-        </form>
-    </div>
-
-    <div class="wip-container">
-        <div class="wip-box">
-            <label>🚀 Límite WIP (En Progreso): </label>
-            <select id="wip-limit-select" onchange="actualizarTablero()">
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20" selected>20</option>
-                <option value="25">25</option>
-                <option value="30">30</option>
-            </select>
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>Acceso G1_E1</h2>
+            <input type="text" id="l-user" placeholder="Usuario">
+            <input type="password" id="l-pass" placeholder="Contraseña">
+            <button onclick="intentarLogin()" class="btn-main">Entrar</button>
+            <p id="l-err" style="color:red; display:none; margin-top:10px;">Credenciales incorrectas</p>
         </div>
     </div>
 
-    <div class="kanban-board">
-        <div class="column" data-status="to do" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
-            <h3>📝 Por Hacer</h3>
-            <div id="list-to-do" class="task-list"></div>
+    <div id="app-container" style="display:none;">
+        <div style="text-align:right; margin-bottom:20px;">
+            <span>👤 <b id="u-name"></b> | 🚀 <b id="u-team"></b></span>
+            <button onclick="logout()" style="color:red; border:none; background:none; cursor:pointer;">(Salir)</button>
         </div>
 
-        <div class="column" data-status="in progress" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
-            <h3>⚡ En Progreso 
-                <span id="wip-status" class="wip-counter">Dificultad: 0 / 20</span>
-            </h3>
-            <div id="list-in-progress" class="task-list"></div>
+        <div class="form-section">
+            <h2>Nueva Tarea</h2>
+            <form id="task-form">
+                <input type="text" id="nombre" placeholder="Nombre de la tarea" required>
+                <textarea id="descripcion" placeholder="Descripción" required></textarea>
+                <input type="number" id="dificultad" placeholder="Dificultad (1-10)" min="1" max="10" value="5">
+                <select id="estado">
+                    <option value="to do">Por Hacer</option>
+                    <option value="in progress">En Progreso</option>
+                    <option value="done">Finalizado</option>
+                </select>
+                <input type="text" id="asignado" placeholder="Asignado a..." required>
+                <button type="submit" class="btn-main">Añadir al Tablero</button>
+            </form>
         </div>
 
-        <div class="column" data-status="done" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
-            <h3>✅ Finalizado</h3>
-            <div id="list-done" class="task-list"></div>
+        <div class="kanban-board">
+            <div class="column" data-status="to do" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
+                <h3>📝 Por Hacer</h3>
+                <div id="list-to-do" class="task-list"></div>
+            </div>
+
+            <div class="column" data-status="in progress" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
+                <h3>⚡ En Progreso</h3>
+                <div class="wip-header-control">
+                    <label>Límite WIP: </label>
+                    <select id="wip-limit-select" onchange="actualizarTablero()" style="width: 60px; margin-bottom:0; padding:2px;">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="30">30</option>
+                    </select>
+                    <span id="wip-status" class="wip-counter">Carga: 0 / 20</span>
+                </div>
+                <div id="list-in-progress" class="task-list"></div>
+            </div>
+
+            <div class="column" data-status="done" ondragover="allowDrop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">
+                <h3>✅ Finalizado</h3>
+                <div id="list-done" class="task-list"></div>
+            </div>
         </div>
     </div>
 
     <div id="edit-modal" class="modal">
-        <div class="modal-content">
+        <div style="background:white; padding:20px; border-radius:10px; width:350px;">
             <h3>✏️ Editar Tarea</h3>
             <input type="hidden" id="edit-id">
             <input type="text" id="edit-nombre">
-            <input type="number" id="edit-dificultad" min="1" max="10">
+            <input type="number" id="edit-dificultad">
             <input type="text" id="edit-asignado">
             <button onclick="guardarEdicion()" class="btn-main">Guardar</button>
-            <button onclick="cerrarModal()" style="background:none; border:none; color:grey; width:100%; margin-top:10px; cursor:pointer;">Cancelar</button>
+            <button onclick="cerrarModal()" style="width:100%; border:none; margin-top:5px; cursor:pointer; background:#eee; padding:10px;">Cancelar</button>
         </div>
     </div>
 
